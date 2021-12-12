@@ -4,13 +4,15 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 import datetime as dt
 import matplotlib.dates as mdates
+import pandas_datareader as web
+import numpy as np
+import json
 from datetime import date
 from datetime import timedelta, date
 from yahoofinancials import YahooFinancials
 from random import randint
-import pandas_datareader as web
-import numpy as np
-import json
+from marche_aleatoire import generate_list_date, affichage_100_marches_aleatoires
+
 
 class monte_carlo_pricing():
     # Stocastic walk

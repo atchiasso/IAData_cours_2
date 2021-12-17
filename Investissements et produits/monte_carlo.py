@@ -109,10 +109,10 @@ if __name__ == '__main__':
     m_a.affichage_valhist_marche(y_aapl, data, last_value_walk)
 
     # Calcul du payoff pour chaque marche aleatoire
-    payoff_marches = monte_carlo.long_call(last_value_walk, k)
-    print("Payoff pour chaque marche générée: ",payoff_marches)
+    payoff_marche = monte_carlo.long_call(last_value_walk, k)
+    print("Payoff pour chaque marche générée: ",payoff_marche)
     # Moyenne des payoffs calculés
-    print("Moyenne des payoffs calculés: ",mean(payoff_marches))
+    print("Moyenne des payoffs calculés: ",mean(payoff_marche))
 
     # Calcul du prix de l'option avec le modèle Black Scholes
     C = monte_carlo.call(s0, k, T, r, drift, volatility)

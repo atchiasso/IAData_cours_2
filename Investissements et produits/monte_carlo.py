@@ -1,17 +1,20 @@
 import pandas as pd
 import datetime
+import scipy
 import yfinance as yf
 import matplotlib.pyplot as plt
 import datetime as dt
 import matplotlib.dates as mdates
 import pandas_datareader as web
 import numpy as np
-import json
+
+from scipy import stats
+from statistics import mean
 from datetime import date
 from datetime import timedelta, date
 from yahoofinancials import YahooFinancials
 from random import randint
-from marche_aleatoire import generate_list_date, affichage_100_marches_aleatoires
+from marche_aleatoire import *
 
 
 class monte_carlo_pricing():
@@ -23,11 +26,28 @@ class monte_carlo_pricing():
         for i in range(periods):
             p += dr*p + w[i]*vol*p
         return p
+    
+    def long_call(self, last_value_walk, k):
+    # Long Put Payoff = max(Strike Price - Stock Price, 0)     # If we are long a call, we would only elect to call if the current stock price is greater than     # the strike price on our option
+        payoff_list = []     
+        for i in range(len(last_value_walk)):
+            P = max(last_value_walk[i] - k, 0)
+            payoff_list.append(P)
+        return payoff_list
+    
+    # Modèle de Black Scholes
+    def d1(self, S, K, T, r, q, o):
+        return (np.log(S / K) + ((r-q) + 0.5 * o ** 2) * T) / (o * np.sqrt(T))
+    
+    def d2(self, S, K, T, r,q, o):
+        return self.d1(S, K, T, r,q, o) - o * np.sqrt(T)
 
-
-
+    def call(self, S, K, T, r,q, o):
+        return S *np.exp(-q*T)* cdf(self.d1(S, K, T, r,q, o)) - K * np.exp(-r * T) * cdf(self.d2(S, K, T, r,q, o))
+   
 if __name__ == '__main__':
 
+    m_a = marche_aleatoire()
     monte_carlo = monte_carlo_pricing()
     symbol = "AAPL"
 
@@ -36,6 +56,8 @@ if __name__ == '__main__':
 
     current_price = equity.info['currentPrice']
     print(f"Current price of {symbol} - ${current_price}")
+
+    cdf = stats.norm(0, 1).cdf
 
     # Optional seed
     np.random.seed(12345678)
@@ -53,6 +75,7 @@ if __name__ == '__main__':
 
     avg = 0			            	# Temporary variable to be assigned to the sum
                                     # of the simulated payoffs
+    T = 1                           # maturity T
 
     # Simulation loop
     for i in range(N):
@@ -76,5 +99,23 @@ if __name__ == '__main__':
     print("Daily expected volatility: ",volatility*100,"%")
     print("Total trials: ",N)
     print("Zero trials: ",zero_trials)
-    print("Percentage of total trials: ",zero_trials/N*100,"%")
+    print("Percentage of total trials: ",zero_trials/N*100,"%")   
+
+    # Marches aleatoires d'Apple générées d'ajd à date de maturité de l'option
+    last_value_walk = marche_aleatoire.last_value_walk
+    data = marche_aleatoire.data
+    y_aapl = marche_aleatoire.y_aapl
+    m_a.generate_aapl_market(y_aapl, data)
+    m_a.affichage_valhist_marche(y_aapl, data, last_value_walk)
+
+    # Calcul du payoff pour chaque marche aleatoire
+    payoff_marches = monte_carlo.long_call(last_value_walk, k)
+    print("Payoff pour chaque marche générée: ",payoff_marches)
+    # Moyenne des payoffs calculés
+    print("Moyenne des payoffs calculés: ",mean(payoff_marches))
+
+    # Calcul du prix de l'option avec le modèle Black Scholes
+    C = monte_carlo.call(s0, k, T, r, drift, volatility)
+    print("Prix de l'option avec Black Scholes: ", C)
+
 

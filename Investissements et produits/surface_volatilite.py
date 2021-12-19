@@ -43,7 +43,6 @@ class surface_volatilite():
         :param sigma: volatility
         :return: call price
         '''
-
         d1 = (np.log(S/K) + (r + 0.5*vol**2)*T) / (vol*np.sqrt(T))
         d2 = d1 - vol * np.sqrt(T)
         return S * norm.cdf(d1) - np.exp(-r * T) * K * norm.cdf(d2)
@@ -64,6 +63,14 @@ class surface_volatilite():
                 return sigma
             sigma = sigma + diff/vega # f(x) / f'(x)
         return sigma
+
+    def plot3D(self,X,Y,Z):
+        fig = plt.figure()
+        ax = Axes3D(fig, azim = -29, elev = 50)
+        ax.plot(X,Y,Z,'o')
+        plt.xlabel("expiry")
+        plt.ylabel("strike")
+        plt.show()
 
 if __name__ == '__main__':
 

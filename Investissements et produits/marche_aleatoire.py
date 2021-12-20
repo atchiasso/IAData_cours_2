@@ -22,13 +22,13 @@ class marche_aleatoire:
 
     last_value_walk = []
     y_aapl = []
-    # Data Column Index to List of Date
     price_list = data.values.tolist()
     
     for sublist in price_list:
         for val in sublist:
             y_aapl.append(val)
     
+    # Définition d'une marche aléatoire
     def marche(self, valprec):
         if(valprec == 0):
             return valprec+1
@@ -37,6 +37,7 @@ class marche_aleatoire:
             value = self.marche(valprec)
         return value
 
+    # Initialisation des marches aléatoires (nombre de marches à définir)
     def initialize_marche(self, nb, debut=0):
         list_market = []
         list_market.append(debut)
@@ -49,6 +50,7 @@ class marche_aleatoire:
                 list_market.append(value)
         return list_market
 
+    # Initialisation de 1000 marches aléatoires
     def initialize_marche2(self, debut=0):
         list_market = []
         list_market.append(debut)
@@ -61,10 +63,12 @@ class marche_aleatoire:
                 list_market.append(value)
         return list_market
 
+    # Fournit une liste de date
     def daterange(self, start_date, end_date):
         for n in range(int ((end_date - start_date).days)):
             yield start_date + timedelta(n)
 
+    # Génération d'une liste de 100 dates
     def generate_list_date(self, start_date, end_date):
         list_date = []
         i = 0
@@ -75,6 +79,7 @@ class marche_aleatoire:
             if(i == 100):
                 return list_date
 
+    # Génération d'une liste de 1000 dates
     def generate_list_date2(self, start_date, end_date):
         list_date = []
         i = 0
@@ -85,6 +90,7 @@ class marche_aleatoire:
             if(i == 1000):
                 return list_date
 
+    # Affichage des 100 marches aleatoires
     def affichage_100_marches_aleatoires(self):
         x = self.generate_list_date(date(2021, 3, 1), date.today())
         y = self.initialize_marche(99)
@@ -92,12 +98,13 @@ class marche_aleatoire:
         plt.plot(x,y)
         plt.show()
 
+    # Valeurs historiques AAPL 
     def affichage_val_hist_appl(self, data):
-        # Valeurs historiques AAPL 
         plt.figure(1, figsize=(5, 3))
         plt.plot(data)
         plt.show()
 
+    # Génération des valeurs historiques AAPL
     def generate_aapl_market(self, y_aapl, data):
         today = datetime.date.today()
         yesterday = today - datetime.timedelta(days = 1)
@@ -109,6 +116,7 @@ class marche_aleatoire:
         axe_y = y_aapl + y_generate
         return axe_x, axe_y
 
+    # Affichage des valeurs historiques de la marche aléatoire
     def affichage_valhist_marche(self, y_aapl, data, last_value_walk):
         color_list = ['b-', 'g-', 'r-', 'c-', 'v-']
         for i in range(5):

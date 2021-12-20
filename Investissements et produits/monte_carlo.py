@@ -22,7 +22,6 @@ class monte_carlo():
     
     symbol = "AAPL"
 
-    # Create the object representing the symbol of interest
     equity = yf.Ticker(symbol)
 
     current_price = equity.info['currentPrice']
@@ -30,35 +29,32 @@ class monte_carlo():
 
     cdf = stats.norm(0, 1).cdf
 
-    # Optional seed
+    # Graine aléatoire
     np.random.seed(12345678)
 
-    # Parameters
-    s0 = current_price	          	# Actual price
-    drift = 0.0016273		      # Drift term (daily)
-    volatility = 0.088864	  	# Volatility (daily)
-    t_ = 365 		            	# Total periods in a year
-    r = 0.033 			          # Risk free rate (yearly)
-    days = 2			            # Days until option expiration
-    N = 100000		          	# Number of Monte Carlo trials
-    zero_trials = 0		      	# Number of trials where the option payoff = 0
-    k = 100				            # Strike price
+    # Paramètres utilisés
+    s0 = current_price	          	# Prix actuel
+    drift = 0.0016273		        # Terme de dérive (Quotidien)
+    volatility = 0.088864	  	    # Volatilité (Quotidien)
+    t_ = 365 		            	# Périodes totales dans une année
+    r = 0.033 			            # Taux sans risque (Annuel)
+    days = 2			            # Jours jusqu'à l'expiration de l'option
+    N = 100000		          	    # Nombre d'essais de Monte Carlo
+    zero_trials = 0		      	    # Nombre d'essais où le gain de l'option = 0
+    k = 100				            # Prix d'exercice
+    avg = 0			            	# Variable temporaire à affecter à la somme des gains simulés
+    T = 1                           # Maturité T
 
-    avg = 0			            	# Temporary variable to be assigned to the sum
-                                    # of the simulated payoffs
-    T = 1                           # maturity T
-
-    # Stocastic walk
-    # This function calculates the stochastic integral after periods
-    # and returns the final price.
+    # Cette fonction calcule l'intégrale stochastique après les périodes et renvoie le prix final
     def stoc_walk(self, p, dr, vol, periods):
         w = np.random.normal(0,1,size=periods)
         for i in range(periods):
             p += dr*p + w[i]*vol*p
         return p
     
+    # Long Put Payoff = max(Strike Price - Stock Price, 0)     
+    # If we are long a call, we would only elect to call if the current stock price is greater than the strike price on our option
     def long_call(self, last_value_walk, k):
-    # Long Put Payoff = max(Strike Price - Stock Price, 0)     # If we are long a call, we would only elect to call if the current stock price is greater than     # the strike price on our option
         payoff_list = []     
         for i in range(len(last_value_walk)):
             P = max(last_value_walk[i] - k, 0)
@@ -80,7 +76,7 @@ if __name__ == '__main__':
     m_a = marche_aleatoire()
     monte_carlo = monte_carlo()
 
-    # Simulation loop
+    # Boucle de simulation
     for i in range(monte_carlo.N):
         temp = monte_carlo.stoc_walk(monte_carlo.s0,monte_carlo.drift,monte_carlo.volatility,monte_carlo.days)
         if temp > monte_carlo.k:
@@ -90,19 +86,19 @@ if __name__ == '__main__':
         else:
             monte_carlo.zero_trials += 1
 
-    # Averaging the payoffs
+    # Moyenne des gains
     price = monte_carlo.avg/float(monte_carlo.N)
 
-    # Priting the results
+    # Affichage des résultats
     print("MONTE CARLO PLAIN VANILLA CALL OPTION PRICING")
-    print("Option price: ",price)
-    print("Initial price: ",monte_carlo.s0)
-    print("Strike price: ",monte_carlo.k)
-    print("Daily expected drift: ",monte_carlo.drift*100,"%")
-    print("Daily expected volatility: ",monte_carlo.volatility*100,"%")
-    print("Total trials: ",monte_carlo.N)
-    print("Zero trials: ",monte_carlo.zero_trials)
-    print("Percentage of total trials: ",monte_carlo.zero_trials/monte_carlo.N*100,"%")   
+    print("Option price: ", price)
+    print("Initial price: ", monte_carlo.s0)
+    print("Strike price: ", monte_carlo.k)
+    print("Daily expected drift: ", monte_carlo.drift*100, "%")
+    print("Daily expected volatility: ", monte_carlo.volatility*100, "%")
+    print("Total trials: ", monte_carlo.N)
+    print("Zero trials: ", monte_carlo.zero_trials)
+    print("Percentage of total trials: ", monte_carlo.zero_trials/monte_carlo.N*100, "%")   
 
     # Marches aleatoires d'Apple générées d'ajd à date de maturité de l'option
     last_value_walk = marche_aleatoire.last_value_walk

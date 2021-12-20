@@ -36,12 +36,12 @@ class surface_volatilite():
 
     def black_scholes_call(self, S, K, T, r, vol):
         '''
-        :param S: Asset price
-        :param K: Strike price
-        :param T: Time to maturity
-        :param r: risk-free rate (treasury bills)
-        :param sigma: volatility
-        :return: call price
+        S : Prix ​​de l'actif
+        K : Prix ​​d'exercice (Strike price)
+        T : Délai de maturité
+        r : Taux sans risque
+        sigma : Volatilité
+        return : Prix d'appel
         '''
         d1 = (np.log(S/K) + (r + 0.5*vol**2)*T) / (vol*np.sqrt(T))
         d2 = d1 - vol * np.sqrt(T)
@@ -64,11 +64,11 @@ class surface_volatilite():
             sigma = sigma + diff/vega # f(x) / f'(x)
         return sigma
 
-    def plot3D(self,X,Y,Z):
+    def plot3D(self, X, Y, Z):
         fig = plt.figure()
         ax = Axes3D(fig, azim = -29, elev = 50)
-        ax.plot(X,Y,Z,'o')
-        plt.xlabel("expiry")
+        ax.plot(X, Y, Z, 'o')
+        plt.xlabel("Expiration")
         plt.ylabel("strike")
         plt.show()
 

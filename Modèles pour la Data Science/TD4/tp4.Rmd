@@ -117,6 +117,51 @@ plot (uk.simpls)
 pred.uk=predict (uk.simpls,as.matrix (ukcomp.test[,2:13]),4)
 mean((pred.uk-ukcomp.test[,"RETCAP"])** 2)
 ```
+```{r}
+library(pls)
+#Nombre optimal de composantes par validation croisée
+uk.simpls= mvr(RETCAP~ .,data =ukcomp.app, ncomp=12, validation="CV",
+method="simpls")
+summary(uk.simpls)
+#Graphique
+plot(uk.simpls)
+#Noter le nombre optimal de composantes
+#Calcul des prévisions
+pred.uk=predict(uk.simpls,as.matrix (ukcomp.test[,2:13]),4)
+mean((pred.uk-ukcomp.test[,"RETCAP"])** 2)
+```
+```{r}
+uk.pcr = pcr(RETCAP~ .,data =ukcomp.app, ncomp=12,validation="CV")
+summary(uk.pcr) # noter le nombre optimal
+#Calcul des prévisions
+pred.uk=predict (uk.pcr,as.matrix(ukcomp.test[,2:13]),8)
+mean((pred.uk-ukcomp.test[,"RETCAP"])** 2)
+```
+```{r}
+library(MASS)
+ridge.uk=lm.ridge(RETCAP ~ .,data =ukcomp.app,lambda=seq (0,0.4,0.001))
+par (mfrow=c (1,1))
+plot (ridge.uk)
+```
+```{r}
+select(ridge.uk)
+# noter la valeur puis estimer
+ridgeopt.uk=lm.ridge(RETCAP ~ .,data=ukcomp.app,lambda=0.033)
+ridgeopt.uk
+```
+```{r}
+coeff=coef(ridgeopt.uk)
+fit.rid=rep(coeff[1],nrow(ukcomp.app))+as.vector(coeff[-1]%*%
+t(data.matrix(ukcomp.app[,-1])))
+fit.rid
+plot(fit.rid,ukcomp.app[,"RETCAP"])
+res.rid=fit.rid-ukcomp.app[,"RETCAP"]
+plot.res(fit.rid,res.rid,titre="")
+
+prediction=rep(coeff[1],nrow(ukcomp.test))+as.vector(coeff[-1]%*%t(data.matrix
+(ukcomp.test[,-1])))
+mean((ukcomp.test[,1]-prediction)^2)
+```
 
 ```
 

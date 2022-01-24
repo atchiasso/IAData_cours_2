@@ -40,6 +40,85 @@ summary(fit.lm)
 # Retour au graphique standard
 par(mfrow=c (1,1))
 ```
+```{r}
+#Noter q
+uk.lmback=step(fit.lm)
+#Des paramètres restent non significatifs
+anova(uk.lmback)
+```
+```{r}
+#k=log(n) pour BIC au lieu de AIC.
+uk.lmback=step(fit.lm ,k=log(40))
+#Noter q et les variables
+anova(uk.lmback)
+```
+```{r}
+fit.lm =lm(RETCAP~1,data=ukcomp.app)
+uk.lmfor=step (fit.lm ,scope=list (lower =~ 1,upper=~WCFTCL+WCFTDT+GEARRAT+LOGSALE+LOGASST+NFATAST+CAPINT+FATTOT+INVTAST+PAYOUT+QUIKRAT+CURRAT),direction="forward")
+# noter q
+anova (uk.lmfor) 
+```
+```{r}
+fit.lm =lm (RETCAP ~ 1 , data = ukcomp.app)
+uk.lmfor=step (fit.lm ,scope=list (lower =~ 1,upper =~WCFTCL+WCFTDT+GEARRAT+LOGSALE+LOGASST+NFATAST+CAPINT+FATTOT+INVTAST+PAYOUT+QUIKRAT+CURRAT),direction="forward",
+k=log (40))
+# noter q et les variables
+anova (uk.lmfor) 
+```
+```{r}
+fit.lm =lm (RETCAP ~ 1 , data = ukcomp.app)
+uk.lmboth=step (fit.lm ,scope=list (lower =~ 1,
+upper =~ WCFTCL+WCFTDT+GEARRAT+LOGSALE+
+LOGASST+NFATAST+CAPINT+FATTOT+INVTAST+
+PAYOUT+QUIKRAT+CURRAT),direction="both")
+#Noter q, les variables
+anova (uk.lmboth)
+```
+```{r}
+fit.lm =lm (RETCAP ~ 1 , data = ukcomp.app)
+uk.lmboth=step (fit.lm ,scope=list (lower =~ 1,
+upper =~ WCFTCL+WCFTDT+GEARRAT+LOGSALE+
+LOGASST+NFATAST+CAPINT+FATTOT+INVTAST+
+PAYOUT+QUIKRAT+CURRAT),direction="both",
+k=log (40))
+# noter q, les variables
+anova (uk.lmboth)
+```
+```{r}
+library(leaps)
+par(mfrow=c (1,1))
+#Extraction des variables explicatives
+ukcomp=ukcomp.app[,2:13]
+#Recherche du meilleur modèle pour chaque q
+uk.choix=leaps(ukcomp,ukcomp.app[,"RETCAP"],method="Cp",nbest=1)
+#valeurs des Cp du meilleur modèle
+uk.choix$Cp
+plot(uk.choix$size-1,uk.choix$Cp)
+# Fixer la dimension / complexité optimale
+t=(uk.choix$Cp==min(uk.choix$ Cp))
+# Liste des variables explicatives
+colnames(ukcomp)[uk.choix$whi[t]]
+```
+```{r}
+lm.uk0=lm(RETCAP ~ WCFTDT+LOGSALE+NFATAST+CURRAT,data =ukcomp.app)
+mean((predict (lm.uk0,newdata=ukcomp.test)-ukcomp.test[,"RETCAP"])** 2)
+```
+```{r}
+install.packages("pls")
+library (pls)
+#Nombre optimal de composantes par validation croisée
+uk.simpls= mvr(RETCAP~ .,data =ukcomp.app, ncomp=12, validation="CV",
+method="simpls")
+summary (uk.simpls)
+#Graphique
+plot (uk.simpls)
+#Noter le nombre optimal de composantes
+#Calcul des prévisions
+pred.uk=predict (uk.simpls,as.matrix (ukcomp.test[,2:13]),4)
+mean((pred.uk-ukcomp.test[,"RETCAP"])** 2)
+```
+
+```
 
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
 

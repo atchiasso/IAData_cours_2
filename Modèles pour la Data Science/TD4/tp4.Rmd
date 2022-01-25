@@ -167,7 +167,24 @@ library(lasso2)
 lasso.uk=l1ce(RETCAP~.,data=ukcomp.app,bound=(1:30)/30,trace=TRUE,absolute.t=FALSE)
 ```
 ```{r}
-
+#Visualisation des coefficients du modèle Lasso
+plot(lasso.uk)
+#Sélection de la pénalité par validation croisée
+gg.uk=gcv(lasso.uk)
+gcv.uk=gg.uk[,4]
+min(gcv.uk)
+lasso.uk.select=l1ce(RETCAP ~.,data=ukcomp.app,bound=27/30,absolute.t=FALSE)
+coef=coef(lasso.uk.select)
+#Prévision et erreur
+fit.lasso= coef[1]+ as.vector(coef[-1]%*%t(data.matrix(ukcomp.app[,-1])))
+plot(fit.lasso,ukcomp.app[,"RETCAP"])
+abline(0,1)
+res.lasso=fit.lasso-ukcomp.app[,"RETCAP"]
+plot.res(fit.lasso,res.lasso,titre="Residus Lasso")
+#Prévision de l’échantillon test
+pred.lasso= coef[1]+ as.vector(coef[-1]%*%
+t(data.matrix(ukcomp.test[,-1])))
+mean((pred.lasso-ukcomp.test[,"RETCAP"])^2)
 ```
 
 ```

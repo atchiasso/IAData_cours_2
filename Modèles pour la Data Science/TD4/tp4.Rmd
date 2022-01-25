@@ -162,6 +162,13 @@ prediction=rep(coeff[1],nrow(ukcomp.test))+as.vector(coeff[-1]%*%t(data.matrix
 (ukcomp.test[,-1])))
 mean((ukcomp.test[,1]-prediction)^2)
 ```
+```{r}
+library(lasso2)
+lasso.uk=l1ce(RETCAP~.,data=ukcomp.app,bound=(1:30)/30,trace=TRUE,absolute.t=FALSE)
+```
+```{r}
+
+```
 
 ```
 
